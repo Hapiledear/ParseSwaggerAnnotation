@@ -1,5 +1,6 @@
 package learn.yh.vo;
 
+import learn.yh.code.DataTypeEnum;
 import lombok.Data;
 
 /**
@@ -18,9 +19,8 @@ public class ApiImplicitParam {
      * <li>If {@code paramType} is "path", the name should be the associated section in the path.</li>
      * <li>For all other cases, the name should be the parameter name as your application expects to accept.</li>
      * </ol>
-     *
      */
-   private String name;
+    private String name;
 
     /**
      * A brief description of the parameter.
@@ -54,7 +54,7 @@ public class ApiImplicitParam {
      * <p>
      * Path parameters should always be set as required.
      */
-    private boolean required=false;
+    private boolean required = false;
 
     /**
      * Allows for filtering a parameter from the API documentation.
@@ -93,9 +93,8 @@ public class ApiImplicitParam {
     /**
      * a single example for non-body type parameters
      *
-     * @since 1.5.4
-     *
      * @return
+     * @since 1.5.4
      */
     private String example;
 
@@ -103,27 +102,24 @@ public class ApiImplicitParam {
     /**
      * Adds the ability to override the detected type
      *
-     * @since 1.5.11
-     *
      * @return
+     * @since 1.5.11
      */
-    private  String type;
+    private String type;
 
     /**
      * Adds the ability to provide a custom format
      *
-     * @since 1.5.11
-     *
      * @return
+     * @since 1.5.11
      */
-    private  String format;
+    private String format;
 
     /**
      * Adds the ability to set a format as empty
      *
-     * @since 1.5.11
-     *
      * @return
+     * @since 1.5.11
      */
     private boolean allowEmptyValue = false;
 
@@ -131,7 +127,6 @@ public class ApiImplicitParam {
      * adds ability to be designated as read only.
      *
      * @since 1.5.11
-     *
      */
     private boolean readOnly = false;
 
@@ -139,9 +134,18 @@ public class ApiImplicitParam {
      * adds ability to override collectionFormat with `array` types
      *
      * @since 1.5.11
-     *
      */
     private String collectionFormat;
 
     private String dateTimeFormat;
+
+    public String getDataType() {
+
+        if (!dataTypeClass.equals(Void.class)) {
+            return dataTypeClass.getName();
+        } else {
+            return DataTypeEnum.getJavaNameFromAplimplicitParamsName(dataType);
+        }
+
+    }
 }

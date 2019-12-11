@@ -8,6 +8,8 @@ import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CodePointCharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.RuleContext;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.text.WordUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,8 +26,14 @@ public class MyApiImplicitParamsVisitor extends ApiImplicitParamsBaseVisitor {
 
     private List<ApiImplicitParam> apiImplicitParamList;
 
+    private ApiImplicitParam currentApiImplicitParam = null;
+
     private String requestTemplate = "@RequestParam(value = \"%s\", required = %s) %s %s";
     private String requestDateTemplate = "@RequestParam(value = \"%s\", required = %s) @DateTimeFormat(pattern = \"%s\") Date %s";
+
+    private String queryTemplate = "if (%s != null) {\n" +
+            "            criteria.and%sEqualTo(%s);\n" +
+            "        }\n";
 
     public void initAndExecute(String context){
         CodePointCharStream charStream =  CharStreams.fromString(context);
@@ -34,6 +42,19 @@ public class MyApiImplicitParamsVisitor extends ApiImplicitParamsBaseVisitor {
         ApiImplicitParamsParser paramsParser = new ApiImplicitParamsParser(commonTokenStream);
         ApiImplicitParamsParser.ApiImplicitParamsContext apiImplicitParamsContext = paramsParser.apiImplicitParams();
         this.visitApiImplicitParams(apiImplicitParamsContext);
+        System.out.println(toRequestParamString().orElse("context is empty"));
+        System.out.println("====================");
+        System.out.println(toControllerQueryString().orElse("context is empty"));
+    }
+
+    public Optional<String> toControllerQueryString(){
+        List<String> controllerParamStringList = new ArrayList<>();
+        apiImplicitParamList.forEach(apiImplicitParam -> {
+            String result =  String.format(queryTemplate,apiImplicitParam.getName(), WordUtils.capitalize(apiImplicitParam.getName()),apiImplicitParam.getName());
+            controllerParamStringList.add(result);
+        });
+
+        return Optional.ofNullable(String.join("\n", controllerParamStringList));
     }
 
     public Optional<String> toRequestParamString(){
@@ -46,7 +67,7 @@ public class MyApiImplicitParamsVisitor extends ApiImplicitParamsBaseVisitor {
             apiImplicitParamList.forEach(apiImplicitParam -> {
                 String result = "";
                 if ("Date".equals(apiImplicitParam.getDataType())){
-                    result = String.format(requestDateTemplate,apiImplicitParam.getName(),apiImplicitParam.isRequired(),null,apiImplicitParam.getName());
+                    result = String.format(requestDateTemplate,apiImplicitParam.getName(),apiImplicitParam.isRequired(),apiImplicitParam.getDateTimeFormat(),apiImplicitParam.getName());
                 }else {
                     result =  String.format(requestTemplate,apiImplicitParam.getName(),apiImplicitParam.isRequired(),apiImplicitParam.getDataType(),apiImplicitParam.getName());
                 }
@@ -68,6 +89,7 @@ public class MyApiImplicitParamsVisitor extends ApiImplicitParamsBaseVisitor {
     @Override
     public Object visitApiImplicitParam(ApiImplicitParamsParser.ApiImplicitParamContext ctx) {
         ApiImplicitParam apiImplicitParam = new ApiImplicitParam();
+        currentApiImplicitParam = apiImplicitParam;
         if (!ctx.name().isEmpty()){
             apiImplicitParam.setName(visitName(ctx.name(0)));
         }
@@ -98,7 +120,7 @@ public class MyApiImplicitParamsVisitor extends ApiImplicitParamsBaseVisitor {
         if (!ctx.readOnly().isEmpty()){
             apiImplicitParam.setReadOnly(visitReadOnly(ctx.readOnly(0)));
         }
-
+        currentApiImplicitParam = null;
         apiImplicitParamList.add(apiImplicitParam);
         return null;
     }
@@ -111,6 +133,15 @@ public class MyApiImplicitParamsVisitor extends ApiImplicitParamsBaseVisitor {
     @Override
     public String visitValue(ApiImplicitParamsParser.ValueContext ctx) {
         // todo 解析出timeFormat
+        ctx.text_inline().text().forEach(textContext -> {
+            if (null != textContext.TIMEFORTAME1()){
+                currentApiImplicitParam.setDateTimeFormat(textContext.TIMEFORTAME1().getText());
+            }else if (null != textContext.TIMEFORTAME2()){
+                currentApiImplicitParam.setDateTimeFormat(textContext.TIMEFORTAME2().getText());
+            }else{
+                currentApiImplicitParam.setDateTimeFormat(null);
+            }
+        });
         return textToString(ctx.text_inline());
     }
 
