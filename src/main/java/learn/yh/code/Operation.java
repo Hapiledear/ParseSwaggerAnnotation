@@ -7,7 +7,7 @@ package learn.yh.code;
  * @author yanghuang3@jd.com
  */
 public enum Operation {
-    ALL("all"),
+    help("h"),
     request("r"),
     query("q")
     ;

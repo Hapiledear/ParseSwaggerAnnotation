@@ -46,7 +46,7 @@ public class Main {
         Terminal terminal = TerminalBuilder.builder().system(true).build();
         LineReader lineReader = LineReaderBuilder.builder().terminal(terminal).build();
         String prompt = "fog> ";
-        System.out.println("请将@ApiImplicitParams的内容进行复制操作,然后执行命令.使用 Ctrl+D  退出本程序");
+        System.out.println("请将@ApiImplicitParams的内容进行复制操作,然后执行命令.使用 Ctrl+C  退出本程序");
         while (true){
             String line;
             try{
