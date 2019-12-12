@@ -1,5 +1,16 @@
 package learn.yh.code;
 
+import org.jline.reader.EndOfFileException;
+import org.jline.reader.LineReader;
+import org.jline.reader.LineReaderBuilder;
+import org.jline.reader.UserInterruptException;
+import org.jline.terminal.Terminal;
+import org.jline.terminal.TerminalBuilder;
+
+import java.io.IOException;
+import java.sql.SQLOutput;
+import java.util.function.Consumer;
+
 /**
  * Description: main函数
  * Created on:  2019/12/9 下午4:22
@@ -8,8 +19,8 @@ package learn.yh.code;
  */
 public class Main {
 
-    public static void main(String[] args) {
-        String text = "@ApiImplicitParams({\n"
+    public static void main(String[] args)throws IOException {
+      /*  String text = "@ApiImplicitParams({\n"
                 + "            @ApiImplicitParam(name = \"taskId\", value = \"任务id\", required = true, dataType = \"int\", paramType = \"query\"),\n"
                 + "            @ApiImplicitParam(name = \"agencyId\", value = \"一级渠道id\", required = false, dataType = \"int\", paramType = \"query\"),\n"
                 + "            @ApiImplicitParam(name = \"subAgencyId\", value = \"二级渠道id\", required = false, dataType = \"int\", paramType = \"query\"),\n"
@@ -25,24 +36,28 @@ public class Main {
                 + "            @ApiImplicitParam(name = \"endTime\", value = \"数据时间结束yyyy-MM-dd HH:mm:ss\", required = true, dataType = \"date\", paramType = \"query\"),\n"
                 + "            @ApiImplicitParam(name = \"delete\", value = \"是否逻辑删除。0:未删除，1:删除，2:所有。默认查询未逻辑删除\", required = false, dataType = \"int\", paramType = \"query\")})";
         MyApiImplicitParamsVisitor implicitParamsVisitor = new MyApiImplicitParamsVisitor();
-        implicitParamsVisitor.initAndExecute(text);
+        implicitParamsVisitor.initAndExecute(text);*/
 
+        initTerminal(new CommandLineConsumer());
 
-        /*Options options = new Options();
-        options.addOption(Operation.PRASE.getCode(),false,"parse Swagger Annotations");
+    }
 
-        CommandLineParser parser = new DefaultParser();
-
-        try {
-            CommandLine cmd  = parser.parse(options,args);
-            if (cmd.hasOption(Operation.PRASE.getCode())){
-                MyApiImplicitParamsVisitor implicitParamsVisitor = new MyApiImplicitParamsVisitor();
-                implicitParamsVisitor.initAndExecute(cmd.getArgList().get(0));
-            }else {
-                System.out.println("command not found");
+    private static void initTerminal(Consumer<String> lineConsumer) throws IOException{
+        Terminal terminal = TerminalBuilder.builder().system(true).build();
+        LineReader lineReader = LineReaderBuilder.builder().terminal(terminal).build();
+        String prompt = "fog> ";
+        System.out.println("请将@ApiImplicitParams的内容进行复制操作,然后执行命令.使用 Ctrl+D  退出本程序");
+        while (true){
+            String line;
+            try{
+                line = lineReader.readLine(prompt);
+                lineConsumer.accept(line);
+            }catch (UserInterruptException e){
+                System.out.println(e);
+            }catch (EndOfFileException e){
+                System.out.println(e);
+                return;
             }
-        } catch (ParseException e) {
-            System.err.println(e);
-        }*/
+        }
     }
 }

@@ -42,9 +42,20 @@ public class MyApiImplicitParamsVisitor extends ApiImplicitParamsBaseVisitor {
         ApiImplicitParamsParser paramsParser = new ApiImplicitParamsParser(commonTokenStream);
         ApiImplicitParamsParser.ApiImplicitParamsContext apiImplicitParamsContext = paramsParser.apiImplicitParams();
         this.visitApiImplicitParams(apiImplicitParamsContext);
-        System.out.println(toRequestParamString().orElse("context is empty"));
-        System.out.println("====================");
-        System.out.println(toControllerQueryString().orElse("context is empty"));
+    }
+
+    public void printRequest(){
+        String strOut = toRequestParamString().orElse("context is empty");
+        System.out.println(strOut);
+        ClipboardUtil.setSysClipboardText(strOut);
+        System.out.println("已将内容复制到剪切板！！！");
+    }
+
+    public void printQuery(){
+        String strOut = toControllerQueryString().orElse("context is empty");
+        System.out.println(strOut);
+        ClipboardUtil.setSysClipboardText(strOut);
+        System.out.println("已将内容复制到剪切板！！！");
     }
 
     public Optional<String> toControllerQueryString(){

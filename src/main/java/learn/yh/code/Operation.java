@@ -7,7 +7,9 @@ package learn.yh.code;
  * @author yanghuang3@jd.com
  */
 public enum Operation {
-    PRASE("p")
+    ALL("all"),
+    request("r"),
+    query("q")
     ;
     private String code;
 
