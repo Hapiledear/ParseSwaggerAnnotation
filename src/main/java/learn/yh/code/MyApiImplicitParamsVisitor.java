@@ -28,13 +28,6 @@ public class MyApiImplicitParamsVisitor extends ApiImplicitParamsBaseVisitor {
 
     private ApiImplicitParam currentApiImplicitParam = null;
 
-    private String requestTemplate = "@RequestParam(value = \"%s\", required = %s) %s %s";
-    private String requestDateTemplate = "@RequestParam(value = \"%s\", required = %s) @DateTimeFormat(pattern = \"%s\") Date %s";
-
-    private String queryTemplate = "if (%s != null) {\n" +
-            "            criteria.and%sEqualTo(%s);\n" +
-            "        }\n";
-
     public void initAndExecute(String context){
         CodePointCharStream charStream =  CharStreams.fromString(context);
         ApiImplicitParamsLexer lexer = new ApiImplicitParamsLexer(charStream);
@@ -44,51 +37,9 @@ public class MyApiImplicitParamsVisitor extends ApiImplicitParamsBaseVisitor {
         this.visitApiImplicitParams(apiImplicitParamsContext);
     }
 
-    public void printRequest(){
-        String strOut = toRequestParamString().orElse("context is empty");
-        System.out.println(strOut);
-        ClipboardUtil.setSysClipboardText(strOut);
-        System.out.println("已将内容复制到剪切板！！！");
+    public List<ApiImplicitParam> getApiImplicitParamList() {
+        return apiImplicitParamList;
     }
-
-    public void printQuery(){
-        String strOut = toControllerQueryString().orElse("context is empty");
-        System.out.println(strOut);
-        ClipboardUtil.setSysClipboardText(strOut);
-        System.out.println("已将内容复制到剪切板！！！");
-    }
-
-    public Optional<String> toControllerQueryString(){
-        List<String> controllerParamStringList = new ArrayList<>();
-        apiImplicitParamList.forEach(apiImplicitParam -> {
-            String result =  String.format(queryTemplate,apiImplicitParam.getName(), WordUtils.capitalize(apiImplicitParam.getName()),apiImplicitParam.getName());
-            controllerParamStringList.add(result);
-        });
-
-        return Optional.ofNullable(String.join("\n", controllerParamStringList));
-    }
-
-    public Optional<String> toRequestParamString(){
-        List<String> requestParamStringList = new ArrayList<>();
-
-        if (apiImplicitParamList.isEmpty()){
-            System.out.println("apiImplicitParamList is empty");
-            return Optional.empty();
-        }else {
-            apiImplicitParamList.forEach(apiImplicitParam -> {
-                String result = "";
-                if ("Date".equals(apiImplicitParam.getDataType())){
-                    result = String.format(requestDateTemplate,apiImplicitParam.getName(),apiImplicitParam.isRequired(),apiImplicitParam.getDateTimeFormat(),apiImplicitParam.getName());
-                }else {
-                    result =  String.format(requestTemplate,apiImplicitParam.getName(),apiImplicitParam.isRequired(),apiImplicitParam.getDataType(),apiImplicitParam.getName());
-                }
-              requestParamStringList.add(result);
-            });
-        }
-
-        return Optional.ofNullable(String.join(",\n", requestParamStringList));
-    }
-
 
     @Override
     public Object visitApiImplicitParams(ApiImplicitParamsParser.ApiImplicitParamsContext ctx) {

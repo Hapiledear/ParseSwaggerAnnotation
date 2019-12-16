@@ -1,6 +1,6 @@
 package learn.yh.vo;
 
-import learn.yh.code.DataTypeEnum;
+import learn.yh.code.paramEnums.DataTypeEnum;
 import lombok.Data;
 
 /**

@@ -1,4 +1,4 @@
-package learn.yh.code;
+package learn.yh.code.paramEnums;
 
 public enum  DataTypeEnum {
     STRING("string","String"),
