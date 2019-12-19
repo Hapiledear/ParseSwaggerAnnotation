@@ -1,7 +1,7 @@
 grammar ApiImplicitParams;
 
 
-apiImplicitParams       : START apiImplicitParam+ END;
+apiImplicitParams       : START? apiImplicitParam+ END?;
 apiImplicitParam        : ITEM_START (name|value|defaultValue|allowableValues|required|dataType|dataTypeClass|paramType|example|readOnly)+ ITEM_END;
 
 name                    : NAME  text_inline;
